@@ -41,7 +41,7 @@ export default function App() {
     <div className="min-h-screen bg-[#1A1A2E] text-white p-8 font-sans">
       <header className="mb-12 text-center transform skew-x-[-15deg] bg-[#1A1A2E] p-6 border-b-4 border-[#218FFE]">
         <h1 className="text-5xl font-bold tracking-tighter uppercase italic text-white font-teko">
-          Overwatch Hero Level Leaderboard
+          OW Progression Leaderboard | Global Bounties
         </h1>
       </header>
 
