@@ -5,7 +5,7 @@
 
 import { useState, useMemo } from 'react';
 import { heroLeaderboardData } from './constants';
-import { Star, Award, Crown } from 'lucide-react';
+import { Star, Award, Crown, Shield, Crosshair, Plus } from 'lucide-react';
 
 export default function App() {
   const [showFabMessage, setShowFabMessage] = useState(false);
@@ -21,6 +21,15 @@ export default function App() {
     if (level >= 300) return 2;
     if (level >= 100) return 1;
     return 0;
+  };
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'Tank': return <Shield size={16} className="text-blue-400" />;
+      case 'Damage': return <Crosshair size={16} className="text-red-400" />;
+      case 'Support': return <Plus size={16} className="text-green-400" />;
+      default: return null;
+    }
   };
 
   const getInitials = (name: string) => {
@@ -102,6 +111,9 @@ export default function App() {
           return (
             <div key={hero.heroName} className={`group relative bg-[#1e293b] rounded-xl overflow-hidden border transition-all hover:border-[#218FFE] transform skew-x-[-15deg] flex flex-col items-center p-2 md:p-4 ${borderClass}`}>
               {tier === 3 && <Crown className="absolute top-2 text-purple-500" size={24} />}
+              <div className="absolute top-2 left-2 bg-[#1A1A2E]/80 p-1 rounded-full">
+                {getRoleIcon(hero.role)}
+              </div>
               <div className="flex items-center justify-center overflow-hidden m-2 md:m-4">
                 <HeroImage hero={hero} tier={tier} />
               </div>
