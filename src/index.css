@@ -8,3 +8,25 @@
 body {
   overflow-x: hidden;
 }
+
+@keyframes pulse-white { 0%, 100% { box-shadow: 0 0 10px rgba(255,255,255,0.5); } 50% { box-shadow: 0 0 20px rgba(255,255,255,0.8); } }
+@keyframes pulse-blue { 0%, 100% { box-shadow: 0 0 10px #218FFE; } 50% { box-shadow: 0 0 20px #218FFE; } }
+@keyframes pulse-purple { 0%, 100% { box-shadow: 0 0 10px #9D4EDD; } 50% { box-shadow: 0 0 20px #9D4EDD; } }
+@keyframes breathe { 0%, 100% { border-width: 2px; } 50% { border-width: 5px; } }
+@keyframes spark { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+@keyframes gold-dust { 0% { transform: translateY(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
+
+.tier-100-glow { animation: pulse-white 2s infinite; }
+.tier-300-glow { animation: pulse-blue 2s infinite; }
+.tier-300-border { animation: breathe 3s infinite; }
+.tier-500-glow { animation: pulse-purple 2s infinite; }
+.tier-1000-border { 
+  border-image-source: linear-gradient(45deg, #f06, #9f6, #06f, #f06);
+  border-image-slice: 1;
+  border-width: 4px;
+  border-style: solid;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+.burning-text { text-shadow: 0 0 5px #ff4500, 0 0 10px #ff4500, 0 0 15px #ff4500; }
+.animate-gold-dust { animation: gold-dust 2s linear infinite; }
+

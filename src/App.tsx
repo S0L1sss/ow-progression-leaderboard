@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { heroLeaderboardData } from './constants';
+import { Star, Award, Crown } from 'lucide-react';
 
 export default function App() {
   const [showFabMessage, setShowFabMessage] = useState(false);
@@ -13,29 +14,46 @@ export default function App() {
     window.open('https://forms.gle/esV24vw8FoZFC79g9', '_blank');
   };
 
+  const getTier = (level: number) => {
+    if (level >= 1000) return 4;
+    if (level >= 500) return 3;
+    if (level >= 300) return 2;
+    if (level >= 100) return 1;
+    return 0;
+  };
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  const HeroImage = ({ hero }: { hero: typeof heroLeaderboardData[0] }) => {
+  const HeroImage = ({ hero, tier }: { hero: typeof heroLeaderboardData[0], tier: number }) => {
     const [error, setError] = useState(false);
+    
+    const glowClass = tier === 1 ? 'tier-100-glow' : tier === 2 ? 'tier-300-glow' : tier === 3 ? 'tier-500-glow' : '';
 
     if (error) {
       return (
-        <div className="w-[120px] h-[120px] rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-2xl transform skew-x-[15deg] border-2 border-white">
+        <div className={`w-[120px] h-[120px] rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-2xl transform skew-x-[15deg] border-2 border-white ${glowClass}`}>
           {getInitials(hero.heroName)}
         </div>
       );
     }
 
     return (
-      <img 
-        src={hero.imageUrl} 
-        alt={hero.heroName} 
-        className="w-[120px] h-[120px] object-cover block rounded-full border-2 border-white transform skew-x-[15deg]" 
-        referrerPolicy="no-referrer"
-        onError={() => setError(true)}
-      />
+      <div className="relative">
+        {tier === 4 && [...Array(5)].map((_, i) => (
+          <div key={i} className="absolute inset-0 animate-gold-dust" style={{ animationDelay: `${i * 0.5}s` }}>
+            <div className="w-2 h-2 bg-yellow-400 rounded-full" />
+          </div>
+        ))}
+        <img 
+          src={hero.imageUrl} 
+          alt={hero.heroName} 
+          className={`w-[120px] h-[120px] object-cover block rounded-full border-2 border-white transform skew-x-[15deg] ${glowClass}`} 
+          referrerPolicy="no-referrer"
+          onError={() => setError(true)}
+        />
+      </div>
     );
   };
 
@@ -48,33 +66,39 @@ export default function App() {
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
-        {heroLeaderboardData.map((hero) => (
-          <div key={hero.heroName} className="group relative bg-[#1e293b] rounded-xl overflow-hidden border border-white/10 transition-all hover:border-[#218FFE] transform skew-x-[-15deg] flex flex-col items-center p-2 md:p-4">
-            <div className="flex items-center justify-center overflow-hidden m-2 md:m-4">
-              <HeroImage hero={hero} />
+        {heroLeaderboardData.map((hero) => {
+          const tier = getTier(hero.highestLevel);
+          const borderClass = tier === 2 ? 'tier-300-border' : tier === 4 ? 'tier-1000-border' : 'border-white/10';
+          
+          return (
+            <div key={hero.heroName} className={`group relative bg-[#1e293b] rounded-xl overflow-hidden border transition-all hover:border-[#218FFE] transform skew-x-[-15deg] flex flex-col items-center p-2 md:p-4 ${borderClass}`}>
+              {tier === 3 && <Crown className="absolute top-2 text-purple-500" size={24} />}
+              <div className="flex items-center justify-center overflow-hidden m-2 md:m-4">
+                <HeroImage hero={hero} tier={tier} />
+              </div>
+              <div className="p-2 md:p-4 bg-[#1A1A2E] w-full text-center skew-x-[15deg]">
+                <h2 className="text-xl md:text-2xl font-bold font-teko italic uppercase">{hero.heroName}</h2>
+                <p className="text-2xl md:text-4xl font-bold font-teko italic text-gray-400 flex items-center justify-center gap-2">
+                  {hero.highestLevel === 0 ? '--' : hero.highestLevel}
+                  {tier === 1 && <Star className="text-gray-300" size={16} />}
+                  {tier === 2 && <Award className="text-blue-500" size={16} />}
+                </p>
+                <p className={`text-xs md:text-sm text-gray-500 truncate ${tier === 4 ? 'burning-text' : ''}`}>{hero.playerTag}</p>
+              </div>
+              
+              <div className="mt-2 md:absolute md:inset-0 md:bg-[#1A1A2E]/90 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:flex md:items-center md:justify-center">
+                <button
+                  onClick={handleClaim}
+                  className="bg-[#218FFE] text-white font-bold py-2 px-4 md:px-6 rounded-sm transform skew-x-[15deg] hover:bg-[#1a73e8] transition-all min-h-[44px] min-w-[44px]"
+                >
+                  SUBMIT
+                </button>
+              </div>
             </div>
-            <div className="p-2 md:p-4 bg-[#1A1A2E] w-full text-center skew-x-[15deg]">
-              <h2 className="text-xl md:text-2xl font-bold font-teko italic uppercase">{hero.heroName}</h2>
-              <p className="text-2xl md:text-4xl font-bold font-teko italic text-gray-400">
-                {hero.highestLevel === 0 ? '--' : hero.highestLevel}
-              </p>
-              <p className="text-xs md:text-sm text-gray-500 truncate">{hero.playerTag}</p>
-            </div>
-            
-            {/* Submit Button - Always visible on mobile, hover on desktop */}
-            <div className="mt-2 md:absolute md:inset-0 md:bg-[#1A1A2E]/90 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:flex md:items-center md:justify-center">
-              <button
-                onClick={handleClaim}
-                className="bg-[#218FFE] text-white font-bold py-2 px-4 md:px-6 rounded-sm transform skew-x-[15deg] hover:bg-[#1a73e8] transition-all min-h-[44px] min-w-[44px]"
-              >
-                SUBMIT
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* FAB */}
       <button
         onClick={() => {
           setShowFabMessage(true);
