@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { heroLeaderboardData } from './constants';
 import { Star, Award, Crown } from 'lucide-react';
 
 export default function App() {
   const [showFabMessage, setShowFabMessage] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<'All' | 'Tank' | 'Damage' | 'Support'>('All');
 
   const handleClaim = () => {
     window.open('https://forms.gle/esV24vw8FoZFC79g9', '_blank');
@@ -25,6 +26,22 @@ export default function App() {
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
+
+  const sortedHeroes = useMemo(() => {
+    let filtered = heroLeaderboardData;
+    if (selectedRole !== 'All') {
+      filtered = filtered.filter(h => h.role === selectedRole);
+    }
+    
+    const roleOrder: Record<string, number> = { 'Tank': 1, 'Damage': 2, 'Support': 3 };
+    
+    return [...filtered].sort((a, b) => {
+      if (a.role !== b.role) {
+        return (roleOrder[a.role] || 4) - (roleOrder[b.role] || 4);
+      }
+      return a.heroName.localeCompare(b.heroName);
+    });
+  }, [selectedRole]);
 
   const HeroImage = ({ hero, tier }: { hero: typeof heroLeaderboardData[0], tier: number }) => {
     const [error, setError] = useState(false);
@@ -63,10 +80,22 @@ export default function App() {
         <h1 className="text-3xl md:text-5xl font-bold tracking-tighter uppercase italic text-white font-teko">
           OW Progression Leaderboard | Global Bounties
         </h1>
+        
+        <div className="flex justify-center gap-4 mt-6">
+          {['All', 'Tank', 'Damage', 'Support'].map(role => (
+            <button 
+              key={role}
+              onClick={() => setSelectedRole(role as any)}
+              className={`px-6 py-2 font-teko text-xl italic uppercase transition-all ${selectedRole === role ? 'bg-[#218FFE]' : 'bg-[#1e293b] hover:bg-[#2d3748]'}`}
+            >
+              {role}
+            </button>
+          ))}
+        </div>
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
-        {heroLeaderboardData.map((hero) => {
+        {sortedHeroes.map((hero) => {
           const tier = getTier(hero.highestLevel);
           const borderClass = tier === 2 ? 'tier-300-border' : tier === 4 ? 'tier-1000-border' : 'border-white/10';
           
